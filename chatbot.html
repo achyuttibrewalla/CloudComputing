@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>
+			Chatbot
+		</title>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  		<script src="https://code.jquery.com/jquery-3.3.1.min.js"> </script>
+  		<script type="text/javascript" src="lib/axios/dist/axios.standalone.js"></script>
+	    <script type="text/javascript" src="lib/CryptoJS/rollups/hmac-sha256.js"></script>
+	    <script type="text/javascript" src="lib/CryptoJS/rollups/sha256.js"></script>
+	    <script type="text/javascript" src="lib/CryptoJS/components/hmac.js"></script>
+	    <script type="text/javascript" src="lib/CryptoJS/components/enc-base64.js"></script>
+	    <script type="text/javascript" src="lib/url-template/url-template.js"></script>
+	    <script type="text/javascript" src="lib/apiGatewayCore/sigV4Client.js"></script>
+	    <script type="text/javascript" src="lib/apiGatewayCore/apiGatewayClient.js"></script>
+	    <script type="text/javascript" src="lib/apiGatewayCore/simpleHttpClient.js"></script>
+	    <script type="text/javascript" src="lib/apiGatewayCore/utils.js"></script>
+	    <script type="text/javascript" src="apigClient.js"></script>
+  		<script>
+  		//function to get the current date and time according to the browser
+
+  		function getDateTime()
+ 		{
+    		var date = new Date();
+    		var dt = date.toDateString() + " " + date.toLocaleTimeString();
+    		return dt
+  		};
+ 		//function to send the message to the server and get a response back and display it in the chat window
+		function sendMsg()
+		{
+   			var msg = document.getElementById("chatText").value;
+   			var textarea = document.getElementById('chat_log');
+   			var apigClient = apigClientFactory.newClient({apiKey: 'Your_API_KEY'  });
+
+   			
+   			$("#chat_log").append(getDateTime() + " You: "+msg + "\n");
+   			
+	  		var params = {
+			    //This is where any header, path, or querystring request params go. The key is the parameter named as defined in the API
+			};
+			var body = {
+			    //This is where you define the body of the request
+			    "message": msg
+	       
+			};
+			var additionalParams = {
+			};
+
+			apigClient.chatbotPost(params, body, additionalParams)
+			    .then(function(result){
+			    	console.log(result)
+			        //This is where you would put a success callback
+			        $("#chat_log").append(getDateTime() + " BOT: " + result.data + "\n");
+			        textarea.scrollTop = textarea.scrollHeight;
+
+
+			    }).catch( function(result){
+			    	console.log(result)
+			    	alert(result.body)
+			        //This is where you would put an error callback
+		    });
+
+};
+  </script>
+
+
+
+		<style>
+	body  {
+	    background-image: url("bg.png");
+	    background-color: #cccccc;
+	}
+
+	.center {
+	    margin: auto;
+	    width: 60%;
+	}
+
+	textarea {
+    overflow-y: scroll;
+    height: 100px;
+    resize: none; /* Remove this if you want the user to resize the textarea */
+}
+
+	.chatlog {
+	   font: 15px arial, sans-serif;
+	   border: 3px solid #73AD21;
+	   padding: 10px;
+	}
+	#chatborder {
+	  border-style: solid;
+	  background-color: #f6f9f6;
+	  border-width: 3px;
+	  margin-top: 160px;
+	  margin-bottom: 60px;
+	  padding-top: 10px;
+	  padding-bottom: 15px;
+	  padding-right: 20px;
+	  padding-left: 15px;
+	  border-radius: 15px;
+	}
+	#chatbox {
+	  font: 17px arial, sans-serif;
+	  height: 22px;
+	  width: 100%;
+	}
+	</style>
+	</head>
+	<body >
+		<div id='chatborder' class = "center">
+			<div>
+				<textarea  id = "chat_log"  class = "center" readonly = "true"></textarea>
+			</div>
+			<br>
+			<div>
+				<input class = "center" id = "chatText" type="text" name="chat" >
+			</div>
+	    <button onclick="sendMsg()"  type="button">Send</button>
+	</div>
+	</body>
+</html>
